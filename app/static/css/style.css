@@ -1,0 +1,22 @@
+/* app/static/css/style.css */
+/* Add any custom styles here */
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+
+.card {
+    border: none;
+}
+
+.navbar-nav .nav-link.active {
+    font-weight: bold;
+    color: #ffffff !important;
+    /* Use !important to override Bootstrap's default color */
+}
