@@ -1,5 +1,5 @@
 # app/auth.py
-# Updated to handle the 'secure' and 'samesite' cookie flags dynamically.
+# Updated with explicit error flashing for failed form validation.
 from flask import Blueprint, render_template, redirect, url_for, flash, request, make_response, current_app, g
 from werkzeug.security import generate_password_hash
 from .models import User
@@ -24,10 +24,9 @@ def jwt_required(f):
             payload = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
             user = User.objects(pk=payload['sub']).first()
             if not user or user.session_token != payload.get('jti'):
-                # Token is invalid or session has been terminated
                 flash('Your session is invalid. Please log in again.', 'danger')
                 return redirect(url_for('auth.login'))
-            g.user = user  # Make user available for the duration of the request
+            g.user = user
         except jwt.ExpiredSignatureError:
             flash('Your session has expired. Please log in again.', 'info')
             return redirect(url_for('auth.login'))
@@ -40,16 +39,15 @@ def jwt_required(f):
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    if g.get('user'): # Check if user is already loaded by a previous check
+    if g.get('user'):
         return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.objects(email=form.email.data).first()
         if user and user.check_password(form.password.data):
-            # Create JWT
             token = jwt.encode({
                 'sub': str(user.id),
-                'jti': user.session_token, # JWT ID for session invalidation
+                'jti': user.session_token,
                 'iat': datetime.utcnow(),
                 'exp': datetime.utcnow() + timedelta(hours=24)
             }, current_app.config['SECRET_KEY'], algorithm="HS256")
@@ -63,6 +61,12 @@ def login():
             return response
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
+    # If validation fails on POST, flash the specific errors.
+    elif request.method == 'POST':
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"Error in {getattr(form, field).label.text}: {error}", 'danger')
+
     return render_template('login.html', title='Login', form=form)
 
 @auth.route('/register', methods=['GET', 'POST'])
@@ -80,6 +84,5 @@ def register():
 @jwt_required
 def logout():
     response = make_response(redirect(url_for('main.index')))
-    # Clear the cookie to log the user out
     response.delete_cookie('token')
     return response
