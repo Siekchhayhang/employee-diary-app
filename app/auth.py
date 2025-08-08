@@ -48,9 +48,14 @@ def login():
             response = make_response(redirect(url_for('main.index')))
             
             is_production = current_app.config['ENV'] == 'production'
-            samesite_policy = 'Lax' if is_production else None
-
-            response.set_cookie('token', token, httponly=True, secure=is_production, samesite=samesite_policy)
+            
+            response.set_cookie(
+                'token', 
+                token, 
+                httponly=True, 
+                secure=is_production, 
+                samesite='Lax' if is_production else 'Strict'
+            )
             return response
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
