@@ -1,5 +1,5 @@
 # app/models.py
-# UserMixin is removed as we are no longer using Flask-Login.
+# Added reverse_delete_rule to DiaryEntry for better data integrity.
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from datetime import datetime
@@ -14,7 +14,6 @@ class User(db.Document):
     created_at = db.DateTimeField(default=datetime.utcnow)
     session_token = db.StringField(default=lambda: secrets.token_hex(16))
 
-    # We need to provide the 'is_authenticated' property for templates
     @property
     def is_authenticated(self):
         return True
@@ -41,7 +40,7 @@ class DiaryEntry(db.Document):
     title = db.StringField(required=True, max_length=200)
     content = db.StringField(required=True)
     date_posted = db.DateTimeField(required=True, default=datetime.utcnow)
-    author = db.ReferenceField(User, required=True)
+    author = db.ReferenceField(User, required=True, reverse_delete_rule=db.CASCADE)
 
     def __repr__(self):
         return f'<DiaryEntry {self.title}>'
