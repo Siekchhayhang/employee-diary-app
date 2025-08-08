@@ -1,7 +1,7 @@
 # app/forms.py
-# Added UpdateUserRoleForm.
+# Removed 'remember me' field from LoginForm.
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 from .models import User
 
@@ -34,7 +34,3 @@ class ResetPasswordForm(FlaskForm):
     password = PasswordField('New Password', validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
-
-class UpdateUserRoleForm(FlaskForm):
-    role = SelectField('Role', choices=[('employee', 'Employee'), ('admin', 'Admin'), ('superadmin', 'Super Admin')], validators=[DataRequired()])
-    submit = SubmitField('Update Role')
