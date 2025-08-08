@@ -54,7 +54,8 @@ def login():
                 token, 
                 httponly=True, 
                 secure=is_production, 
-                samesite='Lax' if is_production else 'Strict'
+                samesite='Lax',
+                path='/'  # This is the crucial fix
             )
             return response
         else:
@@ -76,5 +77,5 @@ def register():
 @jwt_required
 def logout():
     response = make_response(redirect(url_for('main.index')))
-    response.delete_cookie('token')
+    response.delete_cookie('token', path='/')
     return response
