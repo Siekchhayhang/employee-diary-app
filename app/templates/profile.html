@@ -57,6 +57,7 @@ content %}
     {% for entry in entries %}
     <div
       class="bg-white overflow-hidden shadow-md rounded-lg border border-gray-200"
+      x-data="{ expanded: false }"
     >
       <div class="px-4 py-5 sm:p-6">
         <div class="flex justify-between items-start">
@@ -116,9 +117,17 @@ content %}
             </form>
           </div>
         </div>
-        <p class="mt-4 text-base text-gray-600 leading-relaxed">
-          {{ entry.content }}
-        </p>
+        <div class="mt-4 text-base text-gray-600 leading-relaxed">
+          {% if entry.content|length > 200 %}
+          <span x-show="!expanded">{{ entry.content[:200] }}...</span>
+          <span x-show="expanded">{{ entry.content }}</span>
+          <button
+            @click="expanded = !expanded"
+            class="text-indigo-600 hover:text-indigo-800 font-semibold mt-2"
+            x-text="expanded ? 'See less' : 'See more...'"
+          ></button>
+          {% else %} {{ entry.content }} {% endif %}
+        </div>
       </div>
     </div>
     {% endfor %}
