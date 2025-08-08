@@ -1,11 +1,10 @@
 # app/__init__.py
-# Updated with a before_request hook to load the user on every request.
+# Corrected to fix the circular import error.
 from flask import Flask, g, request, current_app
 from flask_wtf.csrf import CSRFProtect
 from flask_mongoengine import MongoEngine
 from config import config_by_name
 import jwt
-from .models import User
 
 db = MongoEngine()
 csrf = CSRFProtect()
@@ -19,6 +18,9 @@ def create_app(config_name='dev'):
 
     db.init_app(app)
     csrf.init_app(app)
+
+    # Import models here to avoid circular import
+    from .models import User
 
     @app.before_request
     def load_logged_in_user():
