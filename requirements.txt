@@ -10,3 +10,4 @@ Flask-WTF
 flask-mongoengine
 PyJWT
 waitress
+dnspython
