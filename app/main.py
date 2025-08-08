@@ -1,15 +1,15 @@
 # app/main.py
-# Updated to use the new @jwt_required decorator.
-from functools import wraps
+# Corrected missing import for 'wraps'.
 from flask import Blueprint, render_template, flash, redirect, url_for, abort, make_response, g
 from werkzeug.security import generate_password_hash
 from .models import User, DiaryEntry
 from mongoengine.errors import DoesNotExist
 from .forms import DiaryEntryForm, ResetPasswordForm
-from .auth import jwt_required # Import the custom decorator
+from .auth import jwt_required, jwt_optional # Import the new decorator
 import io
 import csv
 import secrets
+from functools import wraps
 
 main = Blueprint('main', __name__)
 
@@ -22,6 +22,7 @@ def superadmin_required(f):
     return decorated_function
 
 @main.route('/')
+@jwt_optional
 def index():
     return render_template('index.html')
 
