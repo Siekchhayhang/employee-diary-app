@@ -1,5 +1,5 @@
 # app/main.py
-# Updated with all new features and routes.
+# Updated with edit and delete routes for diary entries.
 from flask import Blueprint, render_template, flash, redirect, url_for, abort, make_response, g
 from werkzeug.security import generate_password_hash
 from .models import User, DiaryEntry
