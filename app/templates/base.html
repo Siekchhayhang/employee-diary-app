@@ -57,7 +57,7 @@
                 class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
                 >Profile</a
               >
-              {% if current_user.role == 'superadmin' %}
+              {% if current_user.role in ['admin', 'superadmin'] %}
               <a
                 href="{{ url_for('main.admin_panel') }}"
                 class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
@@ -137,7 +137,7 @@
             class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium"
             >Profile</a
           >
-          {% if current_user.role == 'superadmin' %}
+          {% if current_user.role in ['admin', 'superadmin'] %}
           <a
             href="{{ url_for('main.admin_panel') }}"
             class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium"
