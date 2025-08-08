@@ -1,5 +1,5 @@
 # app/auth.py
-# Corrected the cookie settings for local development vs. production.
+# The jwt_required decorator is now simplified.
 from flask import Blueprint, render_template, redirect, url_for, flash, request, make_response, current_app, g
 from werkzeug.security import generate_password_hash
 from .models import User
@@ -11,21 +11,14 @@ from functools import wraps
 auth = Blueprint('auth', __name__)
 
 def jwt_required(f):
+    """
+    A decorator to protect routes. It now relies on the before_request hook
+    to have already loaded g.user.
+    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        token = request.cookies.get('token')
-        if not token:
+        if g.get('user') is None:
             flash('Please log in to access this page.', 'info')
-            return redirect(url_for('auth.login'))
-        try:
-            payload = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-            user = User.objects(pk=payload['sub']).first()
-            if not user or user.session_token != payload.get('jti'):
-                flash('Your session is invalid. Please log in again.', 'danger')
-                return redirect(url_for('auth.login'))
-            g.user = user
-        except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
-            flash('Your session is invalid or has expired. Please log in again.', 'info')
             return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -46,7 +39,6 @@ def login():
             }, current_app.config['SECRET_KEY'], algorithm="HS256")
             
             response = make_response(redirect(url_for('main.index')))
-            
             is_production = current_app.config['ENV'] == 'production'
             
             response.set_cookie(
@@ -55,7 +47,7 @@ def login():
                 httponly=True, 
                 secure=is_production, 
                 samesite='Lax',
-                path='/'  # This is the crucial fix
+                path='/'
             )
             return response
         else:
