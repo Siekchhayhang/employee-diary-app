@@ -1,22 +1,47 @@
-/* app/static/css/style.css */
-/* Add any custom styles here */
+/* These are special directives for Tailwind CSS to work. 
+   Your editor might show a warning, but they are correct. 
+   Installing a Tailwind CSS extension can fix the warnings. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+.animated-border {
+    position: relative;
+    overflow: hidden;
+    background-color: #1f2937;
+    /* A dark background for the border effect */
 }
 
-main {
-    flex: 1;
+.animated-border::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 0deg,
+            transparent 0%,
+            #818cf8 10%,
+            /* Indigo */
+            #a78bfa 20%,
+            /* Violet */
+            transparent 25%);
+    transform: translate(-50%, -50%);
+    animation: rotate 4s linear infinite;
 }
 
-.card {
-    border: none;
+@keyframes rotate {
+    from {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
 }
 
-.navbar-nav .nav-link.active {
-    font-weight: bold;
-    color: #ffffff !important;
-    /* Use !important to override Bootstrap's default color */
+/* This is the inner part of the card that sits on top of the animation */
+.animated-border>div {
+    position: relative;
+    z-index: 1;
 }

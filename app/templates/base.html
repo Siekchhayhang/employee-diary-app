@@ -168,52 +168,68 @@
     <main class="flex-grow">
       <div class="mx-auto max-w-7xl py-8 px-4 sm:px-6 lg:px-8">
         {% with messages = get_flashed_messages(with_categories=true) %} {% if
-        messages %} {% for category, message in messages %} {% set bg_color =
-        'bg-green-100' if category == 'success' else ('bg-red-100' if category
-        == 'danger' else 'bg-blue-100') %} {% set border_color =
-        'border-green-500' if category == 'success' else ('border-red-500' if
-        category == 'danger' else 'border-blue-500') %} {% set text_color =
-        'text-green-800' if category == 'success' else ('text-red-800' if
-        category == 'danger' else 'text-blue-800') %}
-        <div
-          class="rounded-md {{ bg_color }} p-4 mb-6 border-l-4 {{ border_color }}"
-        >
-          <div class="flex">
-            <div class="flex-shrink-0">
-              {% if category == 'success' %}
-              <svg
-                class="h-5 w-5 text-green-500"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              {% else %}
-              <svg
-                class="h-5 w-5 text-red-500"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              {% endif %}
-            </div>
-            <div class="ml-3">
-              <p class="text-sm font-medium {{ text_color }}">{{ message }}</p>
+        messages %}
+        <div class="fixed top-20 right-4 z-50 w-full max-w-sm">
+          {% for category, message in messages %} {% set bg_color =
+          'bg-green-100' if category == 'success' else ('bg-red-100' if category
+          == 'danger' else 'bg-blue-100') %} {% set text_color =
+          'text-green-800' if category == 'success' else ('text-red-800' if
+          category == 'danger' else 'text-blue-800') %}
+
+          <div
+            x-data="{ show: true }"
+            x-init="setTimeout(() => show = false, 5000)"
+            x-show="show"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform translate-x-4"
+            x-transition:enter-end="opacity-100 transform translate-x-0"
+            x-transition:leave="transition ease-in duration-300"
+            x-transition:leave-start="opacity-100 transform translate-x-0"
+            x-transition:leave-end="opacity-0 transform translate-x-4"
+            class="animated-border rounded-lg p-0.5 mb-4 shadow-lg"
+          >
+            <div class="rounded-md {{ bg_color }} p-4">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  {% if category == 'success' %}
+                  <svg
+                    class="h-5 w-5 text-green-500"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  {% else %}
+                  <svg
+                    class="h-5 w-5 text-red-500"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  {% endif %}
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm font-medium {{ text_color }}">
+                    {{ message }}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
+          {% endfor %}
         </div>
-        {% endfor %} {% endif %} {% endwith %} {% block content %}{% endblock %}
+        {% endif %} {% endwith %} {% block content %}{% endblock %}
       </div>
     </main>
 
