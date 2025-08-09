@@ -1,5 +1,5 @@
 # app/main.py
-# Updated with edit and delete routes for diary entries.
+# Updated with new permission logic for downloading reports.
 from flask import Blueprint, render_template, flash, redirect, url_for, abort, make_response, g
 from werkzeug.security import generate_password_hash
 from .models import User, DiaryEntry
@@ -151,7 +151,14 @@ def download_profile_report():
 @jwt_required
 @admin_required
 def download_report():
-    entries = DiaryEntry.objects().order_by('-date_posted')
+    if g.user.role == 'superadmin':
+        # Superadmin gets a full report of all users.
+        entries = DiaryEntry.objects().order_by('-date_posted')
+    else: # This means the user is a regular 'admin'
+        # Admin gets a report of all users EXCEPT superadmins.
+        superadmin_ids = [user.id for user in User.objects(role='superadmin')]
+        entries = DiaryEntry.objects(author__nin=superadmin_ids).order_by('-date_posted')
+
     si = io.StringIO()
     cw = csv.writer(si)
     header = ['Entry ID', 'Title', 'Date Posted', 'Author', 'Content']
