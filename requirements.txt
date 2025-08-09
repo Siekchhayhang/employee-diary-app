@@ -2,6 +2,7 @@
 # Updated with specific package versions to ensure compatibility.
 # Pin Flask and Werkzeug to versions compatible with flask-mongoengine
 # to solve the JSONEncoder import error.
+# Added pytz for timezone handling.
 Flask==2.2.2
 Werkzeug==2.2.2
 python-dotenv
@@ -11,3 +12,4 @@ flask-mongoengine
 PyJWT
 waitress
 dnspython
+pytz

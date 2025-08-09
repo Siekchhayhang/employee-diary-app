@@ -1,5 +1,5 @@
 # app/main.py
-# Updated with new permission logic for downloading reports.
+# Updated with timezone conversion for reports.
 from flask import Blueprint, render_template, flash, redirect, url_for, abort, make_response, g
 from werkzeug.security import generate_password_hash
 from .models import User, DiaryEntry
@@ -9,6 +9,7 @@ from .auth import jwt_required
 import io
 import csv
 import secrets
+import pytz
 from functools import wraps
 
 main = Blueprint('main', __name__)
@@ -135,11 +136,13 @@ def download_profile_report():
     cw = csv.writer(si)
     header = ['Entry ID', 'Title', 'Date Posted', 'Content']
     cw.writerow(header)
+    local_tz = pytz.timezone('Asia/Phnom_Penh')
     for entry in entries:
+        local_dt = entry.date_posted.replace(tzinfo=pytz.utc).astimezone(local_tz)
         cw.writerow([
             entry.id or "",
             entry.title or "",
-            entry.date_posted.strftime('%Y-%m-%d %H:%M:%S') if entry.date_posted else "",
+            local_dt.strftime('%Y-%m-%d %H:%M:%S') if entry.date_posted else "",
             entry.content or ""
         ])
     output = make_response(si.getvalue())
@@ -152,17 +155,16 @@ def download_profile_report():
 @admin_required
 def download_report():
     if g.user.role == 'superadmin':
-        # Superadmin gets a full report of all users.
         entries = DiaryEntry.objects().order_by('-date_posted')
-    else: # This means the user is a regular 'admin'
-        # Admin gets a report of all users EXCEPT superadmins.
+    else:
         superadmin_ids = [user.id for user in User.objects(role='superadmin')]
         entries = DiaryEntry.objects(author__nin=superadmin_ids).order_by('-date_posted')
-
+        
     si = io.StringIO()
     cw = csv.writer(si)
     header = ['Entry ID', 'Title', 'Date Posted', 'Author', 'Content']
     cw.writerow(header)
+    local_tz = pytz.timezone('Asia/Phnom_Penh')
     for entry in entries:
         author_username = "Unknown"
         try:
@@ -171,10 +173,11 @@ def download_report():
         except DoesNotExist:
             author_username = "Deleted User"
         
+        local_dt = entry.date_posted.replace(tzinfo=pytz.utc).astimezone(local_tz)
         cw.writerow([
             entry.id or "",
             entry.title or "",
-            entry.date_posted.strftime('%Y-%m-%d %H:%M:%S') if entry.date_posted else "",
+            local_dt.strftime('%Y-%m-%d %H:%M:%S') if entry.date_posted else "",
             author_username,
             entry.content or ""
         ])
